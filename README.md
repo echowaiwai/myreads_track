@@ -7,7 +7,7 @@ Of course, you are free to start this project from scratch if you wish! Just be 
 ## TL;DR
 
 To get started developing right away:
-
+* Install remote repository to local  with `https://github.com/xumeishan0527/myreads_track.git`
 * install all project dependencies with `npm install`
 * start the development server with `npm start`
 
