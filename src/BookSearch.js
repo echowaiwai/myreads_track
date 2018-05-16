@@ -3,28 +3,54 @@ import './App.css'
 import Book from './Book'
 import * as BooksAPI from './BooksAPI'
 import {Link} from 'react-router-dom'
+import debounce from 'lodash.debounce'
 
 class BookSearch extends Component {
 
-    state = {
-        searchStr: '',
-        bookLists: []
+    constructor(props) {
+        super(props);
+        this.changeSearchStr = this.changeSearchStr.bind(this);
+        this.emitChangeDebounced = debounce(this.emitChange, 100);
+        this.state={
+            searchStr: '',
+            bookLists: []
+        }
+    }
+
+    componentWillUnmount() {
+        this.emitChangeDebounced.cancel();
+    }
+
+    emitChange = (searchStr) => {
+        console.log(searchStr);
+        if (!searchStr) {
+            return null;
+        }
+        BooksAPI.search(searchStr).then(searchbooks => {
+            console.log(searchbooks);
+            if (searchbooks instanceof Array) {
+                searchbooks.map(searchbook => {
+                    this.props.bookLists.forEach(shelfbook => {
+                        if (searchbook.id === shelfbook.id) {
+                            searchbook.shelf = shelfbook.shelf;
+                        }
+                    });
+                    return searchbook;
+                });
+                this.setState({
+                    bookLists: searchbooks
+                });
+            } else {
+                this.setState({
+                    bookLists: []
+                });
+            }
+        });
     };
 
-    changeSearchStr = (searchStr) => {
-        if (!searchStr) {
-            this.setState({searchString: '', booksData: []})
-        } else {
-            this.setState({searchStr: searchStr.trim()});
-            BooksAPI.search(searchStr).then((bookLists) => {
-                if (bookLists.error) {
-                    bookLists = [];
-                }
-                bookLists.map(book => (this.props.bookLists.filter((oneShelfBook) => oneShelfBook.id === book.id)
-                    .map(oneShelfBook => book.shelf = oneShelfBook.shelf)));
-                this.setState({bookLists})
-            })
-        }
+    changeSearchStr(e){
+        e.persist();
+        this.emitChangeDebounced(e.target.value);
     };
 
     render() {
@@ -42,8 +68,7 @@ class BookSearch extends Component {
                         <input
                             type="text"
                             placeholder="Search by title or author"
-                            value={this.state.searchStr}
-                            onChange={(event) => this.changeSearchStr(event.target.value)}
+                            onChange={this.changeSearchStr}
                         />
                     </div>
                 </div>
