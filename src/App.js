@@ -28,23 +28,29 @@ class BooksApp extends React.Component {
      * @param {String} shelf 该书所在书架分类
      */
     handleMoveBook = (book, shelf) => {
-       BooksAPI.update(book, shelf).then(() => {
-            this.setState({
-                bookLists: this.state.bookLists.map(b => {
+        BooksAPI.update(book, shelf).then(() => {
+            let result = [];
+            if (book.shelf) {
+                result = this.state.bookLists.map(b => {
                     if (b.id === book.id) b.shelf = shelf;
                     return b;
                 })
+            } else {
+                book.shelf = shelf;
+                result = this.state.bookLists.concat(book);
+            }
+            this.setState({
+                bookLists: result
             });
         })
     };
-
 
 
     //渲染页面
     render() {
         return (
             <div className="app">
-                {console.log(this.state.bookLists)}
+                {/*{console.log(this.state.bookLists)}*/}
                 {/*主页面*/}
                 <Route
                     path="/search"

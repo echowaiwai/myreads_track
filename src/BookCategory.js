@@ -27,7 +27,7 @@ class BookCategory extends Component {
                             <div className="bookshelf" key={index}>
                                 <h2 className="bookshelf-title">{oneBookShelf}</h2>
                                 <Book
-                                    bookLists={bookLists}
+                                    bookLists={bookLists.filter(item => item.shelf === oneBookShelf)}
                                     oneBookShelf={oneBookShelf}
                                     handleMoveBook={handleMoveBook}
                                 />
